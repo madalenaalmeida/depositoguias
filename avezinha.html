@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avezinha - Loja</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* Estilo geral */
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      color: #333;
+      box-sizing: border-box;
+    }
+
+    /* Cabeçalho */
+    header {
+      background-color: #003366;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+    }
+
+    /* Container principal */
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+    }
+
+    /* Estilo dos produtos */
+    .product-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 25px;
+      border-radius: 15px;
+      background-color: #ffffff;
+      color: #333;
+      text-decoration: none;
+      font-weight: bold;
+      width: 280px;
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .product-card img {
+      height: 120px;
+      width: 120px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .product-card .product-name {
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 10px;
+      color: #003366;
+    }
+
+    /* Botões e formulários */
+    select, input[type="number"], input[type="text"], input[type="email"] {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      width: 100%;
+      max-width: 200px;
+      transition: border-color 0.3s;
+    }
+
+    select:focus, input[type="number"]:focus, input[type="text"]:focus, input[type="email"]:focus {
+      border-color: #0056b3;
+      outline: none;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 18px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 16px;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #218838;
+      transform: scale(1.05);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    /* Estilo do pop-up */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1001;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .popup.show {
+      display: flex;
+      opacity: 1;
+    }
+
+    .popup-content {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      width: 400px;
+      text-align: left;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 0.5s ease;
+      position: relative;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .popup-content h2 {
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+    }
+
+    .popup-content .close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #333;
+      cursor: pointer;
+    }
+
+    .popup-content .close:hover {
+      color: #ff0000;
+    }
+
+    .popup-content .order-list {
+      margin-bottom: 20px;
+    }
+
+    .popup-content .order-list div {
+      margin-bottom: 10px;
+      padding: 10px;
+      background-color: #f8f8f8;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    /* Adicionando espaçamento extra entre as caixas de nome e email */
+    .popup-content .form-group {
+      margin-bottom: 20px;
+    }
+
+    .popup-content .form-group input {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 1.5rem;
+      }
+
+      .product-card {
+        width: 90%;
+      }
+
+      .product-card img {
+        height: 100px;
+        width: 100px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Depósito 1ª Companhia de Viseu</h1>
+  </header>
+
+  <div class="container">
+    <!-- Produto 1: Camisa -->
+    <div class="product-card">
+      <div class="product-name">Camisa (€20)</div>
+      <img src="img/Captura de ecrã 2024-10-23, às 18.40.40.png" alt="Camisa">
+      <div class="form-group">
+        <label for="tamanhoCamisa">Tamanho:</label>
+        <select id="tamanhoCamisa" name="tamanhoCamisa">
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="XL">XL</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="quantidadeCamisa">Quantidade:</label>
+        <input type="number" id="quantidadeCamisa" name="quantidadeCamisa" min="0" value="0">
+      </div>
+    </div>
+
+    <!-- Produto 2: Calças -->
+    <div class="product-card">
+      <div class="product-name">Calças (€40)</div>
+      <img src="calcas.jpg" alt="Calças">
+      <div class="form-group">
+        <label for="tamanhoCalcas">Tamanho:</label>
+        <select id="tamanhoCalcas" name="tamanhoCalcas">
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="XL">XL</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="quantidadeCalcas">Quantidade:</label>
+        <input type="number" id="quantidadeCalcas" name="quantidadeCalcas" min="0" value="0">
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align: center;">
+    <button onclick="openPopup()">Submeter Pedido</button>
+  </div>
+
+  <!-- Pop-up de Confirmação -->
+  <div class="popup" id="popup">
+    <div class="popup-content">
+      <span class="close" onclick="closePopup()">×</span>
+      <h2>Resumo do Pedido</h2>
+      <div id="orderDetails" class="order-list"></div>
+
+      <div class="form-group">
+        <label for="nomeCliente">Nome:</label>
+        <input type="text" id="nomeCliente" name="nomeCliente" placeholder="Seu nome">
+      </div>
+
+      <div class="form-group">
+        <label for="emailCliente">Email:</label>
+        <input type="email" id="emailCliente" name="emailCliente" placeholder="Seu email">
+      </div>
+
+      <button onclick="submitOrder()">Confirmar Pedido</button>
+    </div>
+  </div>
+
+  <script>
+    function openPopup() {
+      const orderDetails = [];
+      const camisaQuantidade = parseInt(document.getElementById('quantidadeCamisa').value) || 0;
+      const calcasQuantidade = parseInt(document.getElementById('quantidadeCalcas').value) || 0;
+
+      if (camisaQuantidade > 0) {
+        orderDetails.push(`Produto: Camisa, Tamanho: ${document.getElementById('tamanhoCamisa').value}, Quantidade: ${camisaQuantidade}`);
+      }
+      if (calcasQuantidade > 0) {
+        orderDetails.push(`Produto: Calças, Tamanho: ${document.getElementById('tamanhoCalcas').value}, Quantidade: ${calcasQuantidade}`);
+      }
+
+      if (orderDetails.length > 0) {
+        document.getElementById('orderDetails').innerHTML = orderDetails.map(item => `<div>${item}</div>`).join('');
+        document.getElementById('popup').classList.add('show');
+      } else {
+        alert('Por favor, adicione produtos ao pedido.');
+      }
+    }
+
+    function closePopup() {
+      document.getElementById('popup').classList.remove('show');
+    }
+
+    function submitOrder() {
+      const nome = document.getElementById('nomeCliente').value;
+      const email = document.getElementById('emailCliente').value;
+
+      if (!nome || !email) {
+        alert('Por favor, preencha o seu nome e e-mail.');
+        return;
+      }
+
+      alert('Pedido finalizado com sucesso!');
+      closePopup();
+    }
+  </script>
+</body>
+</html>

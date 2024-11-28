@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel do Administrador</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    header {
+      background-color: #003366;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f4f4f4;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Painel do Administrador</h1>
+  </header>
+
+  <!-- Tabela Consolidada com Pedidos -->
+  <h2>Compras Consolidadas</h2>
+  <table id="adminTable">
+    <thead>
+      <tr>
+        <th>Ramo</th>
+        <th>Nome</th>
+        <th>Produto</th>
+        <th>Tamanho</th>
+        <th>Quantidade</th>
+        <th>Preço Unitário</th>
+        <th>Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Dados preenchidos dinamicamente -->
+    </tbody>
+  </table>
+
+  <!-- Tabela de Totais por Ramo -->
+  <h2 class="totals-table">Totais por Peça, Tamanho e Ramo</h2>
+  <table id="totalsTable">
+    <thead>
+      <tr>
+        <th>Ramo</th>
+        <th>Produto</th>
+        <th>Tamanho</th>
+        <th>Total de Quantidade</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Dados preenchidos dinamicamente -->
+    </tbody>
+  </table>
+
+  <!-- Botão para Download Consolidado -->
+  <button onclick="downloadConsolidatedExcel()">Baixar Relatório Consolidado</button>
+
+  <script>
+    const ramos = ["Avezinha", "Aventura", "Caravela", "Moinho"]; // Nomes dos ramos
+
+    // Função para carregar a tabela consolidada com os pedidos do localStorage
+    function loadTableData() {
+      const tableBody = document.querySelector('#adminTable tbody');
+      tableBody.innerHTML = ''; // Limpa a tabela antes de recarregar
+
+      ramos.forEach(ramo => {
+        const data = localStorage.getItem(ramo) ? JSON.parse(localStorage.getItem(ramo)) : [];
+
+        data.forEach(item => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${ramo}</td>
+            <td>${item.Nome}</td>
+            <td>${item.Produto}</td>
+            <td>${item.Tamanho}</td>
+            <td>${item.Quantidade}</td>
+            <td>${item.Preço}</td>
+            <td>${item.Subtotal}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      });
+    }
+
+    // Função para carregar a tabela de totais por produto e tamanho, usando dados do localStorage
+    function loadTotalsTable() {
+      const tableBody = document.querySelector('#totalsTable tbody');
+      tableBody.innerHTML = ''; // Limpa a tabela antes de recarregar
+
+      ramos.forEach(ramo => {
+        const data = localStorage.getItem(ramo) ? JSON.parse(localStorage.getItem(ramo)) : [];
+        const productTotals = {};
+
+        // Calcula os totais por produto e tamanho
+        data.forEach(item => {
+          const productName = item.Produto;
+          const size = item.Tamanho;
+          const quantity = parseInt(item.Quantidade);
+
+          const key = `${productName} - ${size}`; // Chave para produto e tamanho
+
+          if (productTotals[key]) {
+            productTotals[key] += quantity;
+          } else {
+            productTotals[key] = quantity;
+          }
+        });
+
+        // Adiciona os totais à tabela
+        for (const [productSizeKey, totalQuantity] of Object.entries(productTotals)) {
+          const [productName, size] = productSizeKey.split(' - '); // Divide a chave para separar produto e tamanho
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${ramo}</td>
+            <td>${productName}</td>
+            <td>${size}</td>
+            <td>${totalQuantity}</td>
+          `;
+          tableBody.appendChild(row);
+        }
+      });
+    }
+
+    // Função para baixar o Excel consolidado
+    function downloadConsolidatedExcel() {
+      let consolidatedData = [];
+
+      ramos.forEach(ramo => {
+        const data = localStorage.getItem(ramo) ? JSON.parse(localStorage.getItem(ramo)) : [];
+        const dataWithRamo = data.map(item => ({ ...item, Ramo: ramo })); // Adiciona a coluna "Ramo"
+        consolidatedData = consolidatedData.concat(dataWithRamo);
+      });
+
+      if (consolidatedData.length === 0) {
+        alert("Não há dados para exportar.");
+        return;
+      }
+
+      const worksheet = XLSX.utils.json_to_sheet(consolidatedData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Relatório Consolidado");
+      XLSX.writeFile(workbook, "Relatorio_Consolidado.xlsx");
+    }
+
+    // Função para atualizar as tabelas sempre que a página for carregada
+    function refreshData() {
+      loadTableData();
+      loadTotalsTable();
+    }
+
+    // Carrega os dados ao abrir a página
+    window.onload = refreshData;
+
+  </script>
+</body>
+</html>
